@@ -1,0 +1,41 @@
+; find food
+
+search_food:            ; search for food to bring home
+move else ktras_food    ; change direction if cant move forward
+goto sense_food         ; check if there is food
+
+ktras_food:               ; keep turning right and stop (ktras)
+flip 6 else ktras_food    ; keep turning with 5/6 probability
+goto search_food          ; stop turning with 1/6 probability
+
+sense_food:
+sense here food else search_food    ; if no food, keep searching
+goto sense_home                     ; if food found, check whether it is already home
+
+sense_home:
+sense here home else search_food    ; if already home, keep searching other food
+goto bring_home                     ; if not already home, bring food home
+
+
+; bring food home
+
+bring_home:
+pickup else search_home    ; if cant pick up, keep searching
+goto search_home           ; if picked up, go home
+
+search_home:
+move else ktras_home       ; change direction if cant move forward
+goto sense_home_to_drop    ; if home found, drop food
+
+ktras_home:               ; keep turning right and stop
+flip 6 else ktras_home    ; keep turning with 5/6 probability
+goto search_home          ; stop turning with 1/6 probability
+
+sense_home_to_drop:
+sense here home else search_home    ; if home not found, keep searching
+drop                                ; if home found, drop food
+goto search_food                    ; go back to searching other food
+
+
+
+
