@@ -5,15 +5,6 @@
 
 #include "utility.hpp"
 
-World::~World()
-{
-    for (int i = 0; i < this->height; i++)
-    {
-        delete[] this->cells[i];
-    }
-    delete[] this->cells;
-}
-
 void World::load(std::string worldfile, std::string redbugfile,
                  std::string blackbugfile)
 {
@@ -47,12 +38,13 @@ void World::load(std::string worldfile, std::string redbugfile,
 
     int bugcount = 0;
     this->bugs.reserve(this->height * this->width);
-    this->cells = new Cell*[this->height];
-    for (int i = 0; i < this->height; i++)
-        this->cells[i] = new Cell[this->width];
+
+    this->cells = std::vector<std::vector<Cell>>(this->height);
 
     for (int i = 0; i < this->height; i++)
     {
+        this->cells[i].reserve(this->width);
+
         std::string line;
         wstr >> line;
         if (line.length() != (unsigned int)(this->width))
@@ -83,8 +75,9 @@ void World::load(std::string worldfile, std::string redbugfile,
                     }
             }
 
-            this->cells[i][j] = Cell(sym);
-            Cell & this_cell = this->cells[i][j];
+            this->cells[i].emplace_back(Cell(sym));
+            Cell & this_cell = this->cells[i].back(); // hold a reference
+
             // if home area, create a bug
             if (this_cell.is_red_home_area()
                 || this_cell.is_black_home_area())
@@ -220,7 +213,7 @@ int World::red_food(void) const
     {
         for (int j = 0; j < this->width; j++)
         {
-            Cell & c = this->cells[i][j];
+            const Cell & c = this->cells[i][j];
             if (c.is_red_home_area())
                 sum += c.get_food();
         }
@@ -236,7 +229,7 @@ int World::black_food(void) const
     {
         for (int j = 0; j < this->width; j++)
         {
-            Cell & c = this->cells[i][j];
+            const Cell & c = this->cells[i][j];
             if (c.is_black_home_area())
                 sum += c.get_food();
         }

@@ -17,7 +17,7 @@ class World
 {
     private:
     int width, height;
-    Cell** cells;
+    std::vector<std::vector<Cell>> cells;
     Program programs[2];
     std::vector<Bug> bugs;
     int adjacent_other_bugs(tposition, tcolor);
@@ -25,7 +25,6 @@ class World
 
     public:
     World(void) = default;
-    ~World();
     inline int get_width(void) const { return this->width; }
     inline int get_height(void) const { return this->height; }
     void load(std::string, std::string, std::string);
