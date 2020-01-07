@@ -12,7 +12,7 @@ static std::istream & stream_to_t(std::istream & istr, T & tvar)
     std::string temp;
     istr >> temp;
     bool found = false;
-    for (int i = 0; i < (int)T::Count; i++)
+    for (int i = 0; i < static_cast<int>(T::Count); i++)
     {
         if (temp == std::to_string(static_cast<T>(i)))
         {
@@ -25,7 +25,7 @@ static std::istream & stream_to_t(std::istream & istr, T & tvar)
     {
         std::string msg = "invalid type value " + temp
                         + ". Options:";
-        for (int i = 0; i < (int)T::Count; i++)
+        for (int i = 0; i < static_cast<int>(T::Count); i++)
         {
             msg += " " + std::to_string(static_cast<T>(i));
         }
@@ -84,7 +84,7 @@ namespace std
             case tcondition::FOEMARKER:
                 return "foemarker";
             default: //tcondition::MARKERX
-                int mark = (int)cond;
+                int mark = static_cast<int>(cond);
                 if (mark < 0 || mark > 5)
                 {
                     std::string msg = "invalid tcondition "
@@ -113,7 +113,7 @@ namespace std
                 return "northeast";
             default:
                     std::string msg = "invalid tdirection "
-                                    + std::to_string((int)dir);
+                                    + std::to_string(static_cast<int>(dir));
                     throw std::runtime_error(msg);
         }
         return std::string();
@@ -129,7 +129,7 @@ namespace std
                 return "right";
             default:
                 std::string msg = "invalid tleftright "
-                                + std::to_string((int)lr);
+                                + std::to_string(static_cast<int>(lr));
                 throw std::runtime_error(msg);
         }
     }
@@ -148,7 +148,7 @@ namespace std
                 return "ahead";
             default:
                 std::string msg = "invalid tsensedir "
-                                + std::to_string((int)sd);
+                                + std::to_string(static_cast<int>(sd));
                 throw std::runtime_error(msg);
         }
     }
@@ -162,7 +162,7 @@ namespace std
         else // NONE falls here
         {
             std::string msg = "invalid tcolor "
-                                + std::to_string((int)col);
+                                + std::to_string(static_cast<int>(col));
             throw std::runtime_error(msg);
         }
         return "";
