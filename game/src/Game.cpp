@@ -5,6 +5,7 @@
 #include <chrono>
 #include <thread>
 
+#include "World.hpp"
 #include "types.hpp"
 #include "Bug.hpp"
 #include "Cell.hpp"
@@ -12,8 +13,13 @@
 Game::Game(std::string worldfile, std::string redbugfile,
             std::string blackbugfile)
 {
-    this_world.load(worldfile, redbugfile, blackbugfile);
+    this->this_world_ptr = std::make_unique<World>();
+    this_world_ptr->load(worldfile, redbugfile, blackbugfile);
 }
+
+// unique_ptr<World> in the header complains World is an incomplete type
+// that is why ~Game is defined here where World.hpp is #included
+Game::~Game() = default;
 
 void Game::simulate(int cycles, bool stats, bool slow, int every,
               std::string report, bool silent)
@@ -30,6 +36,8 @@ void Game::simulate(int cycles, bool stats, bool slow, int every,
         std::string msg = "every argument cannot be a negative integer";
         throw std::invalid_argument(msg);
     }
+
+    World & this_world = *(this->this_world_ptr);
     
     if (!silent)
         print_state(report, this_world, 0);
