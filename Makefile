@@ -14,8 +14,8 @@ example:
 	@$(MAKE) -s -C sim example
 
 clean:
-	$(MAKE) -C asm clean
-	$(MAKE) -C sim clean
+	$(MAKE) -s -C asm cleanall
+	$(MAKE) -s -C sim cleanall
 
 .PHONY: all asm sim example clean
 
