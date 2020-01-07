@@ -16,6 +16,7 @@ class Game
     Game(std::string, std::string, std::string);
     ~Game(); // defined =default in the implementation
     void simulate(int, bool, bool, int, std::string, bool silent);
+    std::pair<int, int> get_score(void);
     static void print_stats(World &);
     static void print_state(std::string, World &, int);
     static void print_map_state(World &);

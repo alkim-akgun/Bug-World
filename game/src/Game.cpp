@@ -61,20 +61,26 @@ void Game::simulate(int cycles, bool stats, bool slow, int every,
     }
 }
 
-void Game::print_stats(World & W)
+std::pair<int, int> Game::get_score()
 {
-    std::cout << "Red bugs collected " << W.red_food()
+    World & w = *(this->this_world_ptr);
+    return std::make_pair<int, int>(w.red_food(), w.black_food());
+}
+
+void Game::print_stats(World & w)
+{
+    std::cout << "Red bugs collected " << w.red_food()
               << " units of food.\n"
-              << "Black bugs collected " << W.black_food()
+              << "Black bugs collected " << w.black_food()
               << " units of food.\n";
-    if (W.winner() == tcolor::NONE)
+    if (w.winner() == tcolor::NONE)
         std::cout << "It's a draw.";
     else
-        std::cout << "Winner is " << std::to_string(W.winner()) << ".";
+        std::cout << "Winner is " << std::to_string(w.winner()) << ".";
     std::cout << std::endl;
 }
 
-void Game::print_state(std::string report, World & W, int cycle)
+void Game::print_state(std::string report, World & w, int cycle)
 {
     if (cycle != 0)
         std::cout << "\n";
@@ -87,9 +93,9 @@ void Game::print_state(std::string report, World & W, int cycle)
         std::cout << "AFTER CYCLE " << cycle << "...\n";
 
     if (report == "map")
-        print_map_state(W);
+        print_map_state(w);
     else if (report == "debug")
-        print_debug_state(W);
+        print_debug_state(w);
     else
     {
         std::string msg = "unknown report argument " + report + " received";
@@ -97,16 +103,16 @@ void Game::print_state(std::string report, World & W, int cycle)
     }
 }
 
-void Game::print_map_state(World & W)
+void Game::print_map_state(World & w)
 {
-    for (int i = 0; i < W.get_height(); i++)
+    for (int i = 0; i < w.get_height(); i++)
     {
         // gives the hexagonal shape - no need
         //if (i % 2 == 1) std::cout << " ";
 
-        for (int j = 0; j < W.get_width(); j++)
+        for (int j = 0; j < w.get_width(); j++)
         {
-            Cell & c = W.get_cell(tposition(i, j));
+            Cell & c = w.get_cell(tposition(i, j));
             // cell description order:
             // obstructed > bug > food > home > free 
             if (c.get_obstructed()) // obstructed
@@ -135,7 +141,7 @@ void Game::print_map_state(World & W)
                         std::cout << "."; // free
                 }
             }
-            if (j != W.get_width()-1)
+            if (j != w.get_width()-1)
                 std::cout << " ";
         }
         std::cout << "\n";
@@ -155,10 +161,10 @@ void Game::print_debug_header(bool repeat)
                  "=== === = == ====== ====== === === ===== ====\n";
 }
 
-void Game::print_debug_state(World & W)
+void Game::print_debug_state(World & w)
 {
-    if (W.get_height() >= 1000
-        || W.get_width() >= 1000)
+    if (w.get_height() >= 1000
+        || w.get_width() >= 1000)
     {
         std::string msg = "debug format does not support "
                           " height or width more than 999";
@@ -166,9 +172,9 @@ void Game::print_debug_state(World & W)
     }
 
     int line = 0;
-    for (int i = 0; i < W.get_height(); i++)
+    for (int i = 0; i < w.get_height(); i++)
     {
-        for (int j = 0; j < W.get_width(); j++)
+        for (int j = 0; j < w.get_width(); j++)
         {
             if (line == 0)
                 print_debug_header(false);
@@ -176,7 +182,7 @@ void Game::print_debug_state(World & W)
                 print_debug_header(true);
             line++;
 
-            Cell & c = W.get_cell(tposition(i, j));
+            Cell & c = w.get_cell(tposition(i, j));
             // cell
                       // x coordinate
             std::cout << std::setfill('0') << std::setw(3) << i << " "
@@ -242,7 +248,7 @@ void Game::print_debug_state(World & W)
                 std::cout << std::setfill('0') << std::setw(4)
                           << b.get_remaining_rest();
             }
-            if (i < W.get_height()-1)
+            if (i < w.get_height()-1)
                 std::cout << "\n";
             else // if last line, also flush buffer
                 std::cout << std::endl;
