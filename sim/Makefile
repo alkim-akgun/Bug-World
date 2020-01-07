@@ -1,5 +1,5 @@
 CC              := g++
-CFLAGS          := -std=c++17 -Wall -Wextra -pedantic -g
+CXXFLAGS        := -std=c++17 -Wall -Wextra -pedantic -O3
 
 SRCDIR          := src
 BUILDDIR        := build
@@ -7,14 +7,16 @@ BINDIR          := bin
 SOURCES         := $(wildcard $(SRCDIR)/*.cpp)
 OBJECTS         := $(SOURCES:$(SRCDIR)/%.cpp=$(BUILDDIR)/%.o)
 
-DEPDIR          := ../types
-DEPINCLDIR      := $(DEPDIR)/include
-DEPSRCDIR       := $(DEPDIR)/src
-DEPSRC          := $(wildcard $(DEPSRCDIR)/*.cpp)
-DEPOBJS         := $(DEPSRC:$(DEPSRCDIR)/%.cpp=$(BUILDDIR)/%.o)
+DEPDIRS         := ../types ../game
+DEPINCLDIRS     := $(DEPDIRS:%=%/include)
+DEPSRCS         := $(foreach dir,$(DEPDIRS),$(wildcard $(dir)/src/*.cpp))
+DEPOBJS         := $(foreach src,$(DEPSRCS), \
+						$(dir $(src))../build/$(basename $(notdir $(src))).o)
+				# also track the header files
+DEPSRCS         += $(foreach dir,$(DEPDIRS),$(wildcard $(dir)/include/*.hpp))
 
 TARGET          := $(BINDIR)/sim
-INCLUDE         := -I$(SRCDIR) -I$(DEPINCLDIR)
+INCLUDE         := -I$(SRCDIR) $(DEPINCLDIRS:%=-I%)
 EXAMPLEARGS     := --cycles 50000 --every 5000 --stats --report map
 EXAMPLESLOWARGS := --cycles 250 --every 1 --slow --stats --report map
 EXAMPLEDBGARGS  := --cycles 100 --every 1 --stats --report debug
@@ -35,20 +37,27 @@ example_slow: $(TARGET)
 example_debug: $(TARGET)
 	$< $(EXAMPLEDBGARGS) $(EXAMPLEFILES)
 
-$(TARGET): $(OBJECTS) $(DEPOBJS)
+$(TARGET): $(OBJECTS) $(DEPSRCS)
 	@mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(INCLUDE) $(OBJECTS) $(DEPOBJS) -o $@
+	for dep in $(DEPDIRS);   \
+	do                       \
+		$(MAKE) -s -C $$dep; \
+	done
+	$(CC) $(CXXFLAGS) $(INCLUDE) $(OBJECTS) $(DEPOBJS) -o $@
 
 $(OBJECTS): $(BUILDDIR)/%.o: $(SRCDIR)/%.cpp
-	@mkdir -p $(BUILDDIR) $(BINDIR)
-	$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
-
-$(DEPOBJS): $(BUILDDIR)/%.o: $(DEPSRCDIR)/%.cpp
-	@mkdir -p $(BUILDDIR) $(BINDIR)
-	$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
+	@mkdir -p $(BUILDDIR)
+	$(CC) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 
 clean:
 	rm -f *.$(LOGEXT)
 	rm -rf $(BUILDDIR) $(BINDIR)
 
-.PHONY: all example example_slow example_debug clean
+cleanall: clean
+	for dep in $(DEPDIRS);         \
+	do                             \
+		$(MAKE) -s -C $$dep clean; \
+	done
+
+.PHONY: all example example_slow example_debug \
+		$(DEPDIRS) $(DEPCLEAN) clean cleanall
