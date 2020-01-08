@@ -9,15 +9,14 @@ void World::load(std::string worldfile, std::string redbugfile,
                  std::string blackbugfile)
 {
     // don't allow this method to be called more than once
-    static bool loaded_before = false;
-    if (loaded_before)
+    if (this->loaded)
     {
-        std::string msg = "an instance of world was attempted to be "
+        std::string msg = "an instance of World was attempted to be "
                           "loaded a second time";
         throw std::runtime_error(msg);
     }
     else
-        loaded_before = true;
+        this->loaded = true;
 
     std::ifstream wstr(worldfile);
     if (!wstr.is_open())

@@ -17,6 +17,7 @@ class World
 {
     private:
     int width, height;
+    bool loaded = false;
     std::vector<std::vector<Cell>> cells;
     Program programs[2];
     std::vector<Bug> bugs;
