@@ -7,7 +7,7 @@ BINDIR          := bin
 SOURCES         := $(wildcard $(SRCDIR)/*.cpp)
 OBJECTS         := $(SOURCES:$(SRCDIR)/%.cpp=$(BUILDDIR)/%.o)
 
-DEPDIRS         := ../types ../game
+DEPDIRS         := ../game
 DEPINCLDIRS     := $(DEPDIRS:%=%/include)
 DEPSRCS         := $(foreach dir,$(DEPDIRS),$(wildcard $(dir)/src/*.cpp))
 DEPOBJS         := $(foreach src,$(DEPSRCS), \
@@ -17,18 +17,20 @@ DEPSRCS         += $(foreach dir,$(DEPDIRS),$(wildcard $(dir)/include/*.hpp))
 
 TARGET          := $(BINDIR)/tour
 INCLUDE         := -I$(SRCDIR) $(DEPINCLDIRS:%=-I%)
-EXAMPLEARGS     := --cycles 50000
-EXAMPLEFILES    := data/example/example.world \
-			       data/example/example.bug \
-			       data/example/example.bug \
-						 data/example/example.bug
 
-LOGEXT          := log
+TOURDIR         := ./data
+TOURARGS        := --cycles 50000
+
+EXAMPLETOURDIR  := ./data/example
+EXAMPLEARGS     := --cycles 50000
 
 all: $(TARGET)
 
 example: $(TARGET)
-	$< $(EXAMPLEARGS) $(EXAMPLEFILES)
+	$< $(EXAMPLEARGS) $(EXAMPLETOURDIR)
+
+tournament: $(TARGET)
+	$< $(TOURARGS) $(TOURDIR)
 
 $(TARGET): $(OBJECTS) $(DEPSRCS)
 	@mkdir -p $(BINDIR)
@@ -43,7 +45,6 @@ $(OBJECTS): $(BUILDDIR)/%.o: $(SRCDIR)/%.cpp
 	$(CC) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 
 clean:
-	rm -f *.$(LOGEXT)
 	rm -rf $(BUILDDIR) $(BINDIR)
 
 cleanall: clean
@@ -52,5 +53,4 @@ cleanall: clean
 		$(MAKE) -s -C $$dep clean; \
 	done
 
-.PHONY: all example example_slow example_debug \
-		$(DEPDIRS) $(DEPCLEAN) clean cleanall
+.PHONY: all example tournament clean cleanall
