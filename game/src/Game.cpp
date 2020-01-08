@@ -178,7 +178,7 @@ void Game::print_debug_state(World & w)
         {
             if (line == 0)
                 print_debug_header(false);
-            else if (debug_HEADER_EVERY != 0 && (line % debug_HEADER_EVERY) == 0)
+            else if (DEBUG_HEADER_EVERY != 0 && (line % DEBUG_HEADER_EVERY) == 0)
                 print_debug_header(true);
             line++;
 
