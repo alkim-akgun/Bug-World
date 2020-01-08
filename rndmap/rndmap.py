@@ -8,7 +8,7 @@ default_height = 30
 default_bug_ratio = 0.03                # default ratio of bugs to map size
 default_obstacle_ratio = 0.1            # default ratio of obstructed cells to map size
 default_food_bug_ratio = 10.0           # default ratio of total food to total bugs
-default_average_food = 5                # default average food among cells with food
+default_average_food = 5.0              # default average food among cells with food
 
 verbose = 2    # 0 disables printing logs, 1 prints important logs, 2 additionally prints food logs
 log = False
