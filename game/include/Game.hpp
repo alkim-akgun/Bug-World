@@ -4,7 +4,7 @@
 #include <memory>
 #include <string>
 
-#define debug_HEADER_EVERY 18 // 0 disables
+#define DEBUG_HEADER_EVERY 18 // 0 disables
 #define SLOW_MODE_SLEEP_MILLISECONDS 125
 
 class World;
