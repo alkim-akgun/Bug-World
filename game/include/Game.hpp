@@ -13,9 +13,9 @@ class Game
 {
     public:
     std::unique_ptr<World> this_world_ptr; // needs ~World
-    Game(std::string, std::string, std::string);
+    Game(std::string, std::string, std::string, bool keep_log=true);
     ~Game(); // defined =default in the implementation
-    void simulate(int, bool, bool, int, std::string, bool silent);
+    void simulate(int, bool, bool, int, std::string, bool);
     std::pair<int, int> get_score(void);
     static void print_stats(World &);
     static void print_state(std::string, World &, int);

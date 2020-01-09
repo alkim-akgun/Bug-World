@@ -244,10 +244,11 @@ void World::error(std::string msg)
 
 void World::log(std::string msg)
 {
-    static std::ofstream logstr("bug_world.log");
+    if (!(this->keep_log)) return;
+
+    static std::ofstream logstr("bug_world.log", std::ofstream::app);
     if (logstr.is_open())
-    {
-        //std::cerr << msg;
+    {;
         logstr << msg;
     }
     else

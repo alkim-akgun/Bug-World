@@ -17,6 +17,7 @@ class World
 {
     private:
     int width, height;
+    bool keep_log = true;
     bool loaded = false;
     std::vector<std::vector<Cell>> cells;
     Program programs[2];
@@ -26,6 +27,7 @@ class World
 
     public:
     World(void) = default;
+    inline World(bool keep_log=true) : keep_log(keep_log) { }
     inline int get_width(void) const { return this->width; }
     inline int get_height(void) const { return this->height; }
     void load(std::string, std::string, std::string);

@@ -1,0 +1,9 @@
+move 2 1
+flip 6 0 1
+sense here 3 0 food
+sense here 4 0 home
+pickup 5 5
+move 7 6
+flip 6 5 6
+sense here 8 5 home
+drop 0

@@ -11,9 +11,9 @@
 #include "Cell.hpp"
 
 Game::Game(std::string worldfile, std::string redbugfile,
-            std::string blackbugfile)
+            std::string blackbugfile, bool keep_log)
 {
-    this->this_world_ptr = std::make_unique<World>();
+    this->this_world_ptr = std::make_unique<World>(keep_log);
     this_world_ptr->load(worldfile, redbugfile, blackbugfile);
 }
 
