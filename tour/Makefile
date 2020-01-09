@@ -20,10 +20,10 @@ INCLUDE         := -I$(SRCDIR) $(DEPINCLDIRS:%=-I%)
 LIBRARY         := -lstdc++fs
 
 TOURDIR         := ./data
-TOURARGS        := --cycles 1000000
+TOURARGS        := --cycles 100000
 
 EXAMPLETOURDIR  := ./data/example
-EXAMPLEARGS     := --cycles 100000
+EXAMPLEARGS     := --cycles 50000
 
 all: $(TARGET)
 
