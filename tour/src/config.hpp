@@ -10,5 +10,6 @@
 #define BUG_EXTENSION ".bug" // case-insensitive
 
 #define LEADERBOARD_FILE "leaderboard.txt"
+#define MATCHRESULTS_FILE "matchresults.txt"
 
 #endif

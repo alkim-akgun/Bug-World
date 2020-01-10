@@ -32,8 +32,8 @@ class Match
   void play();
   void joinThreads();
   inline std::string get_map(void) const { return this->map; }
-  inline std::array<std::shared_ptr<Player>, 2> get_players() {
-                                        return this->players; }
+  inline std::array<std::shared_ptr<Player>, 2> & get_players() {
+                                          return this->players; }
   inline std::array<score, 2> get_results(void) const { return this->results; }
 };
 

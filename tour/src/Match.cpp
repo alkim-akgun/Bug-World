@@ -1,5 +1,8 @@
 #include "Match.hpp"
 
+#include "fs.hpp"
+#include "utility.hpp"
+
 Match::Match(const std::string & map, const std::shared_ptr<Player> p1,
              const std::shared_ptr<Player> p2, int cyc)
              : map(map), cycles(cyc)
