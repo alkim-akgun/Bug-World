@@ -1,0 +1,36 @@
+mark 0 1
+move 3 2
+turn right 3
+sense ahead 9 4 food
+turn left 5
+sense ahead 9 6 food
+turn right 7
+turn right 8
+sense ahead 9 0 food
+move 10 9
+pickup 11 0
+sense here 12 13 home
+drop 0
+turn right 14
+turn right 15
+turn right 16
+move 17 16
+sense ahead 23 18 home
+turn left 19
+sense ahead 23 20 home
+turn right 21
+turn right 22
+sense ahead 23 24 home
+move 32 23
+turn left 25
+sense ahead 31 26 marker0
+turn left 27
+sense ahead 31 28 marker0
+turn right 29
+turn right 30
+sense ahead 31 17 marker0
+move 17 31
+drop 33
+turn left 34
+turn left 35
+turn left 0
