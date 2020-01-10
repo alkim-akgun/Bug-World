@@ -21,8 +21,8 @@ EXAMPLEARGS     := --cycles 50000 --every 5000 --stats --report map
 EXAMPLESLOWARGS := --cycles 250 --every 1 --slow --stats --report map
 EXAMPLEDBGARGS  := --cycles 100 --every 1 --stats --report debug
 EXAMPLEFILES    := data/example/example.world \
-			       data/example/example.bug \
-			       data/example/example.bug
+			       data/example/example1.bug \
+			       data/example/example2.bug
 
 LOGEXT          := log
 

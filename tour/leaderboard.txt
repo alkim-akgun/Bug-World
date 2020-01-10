@@ -1,2 +1,2 @@
-alkimakgun/first                            1937
-example/example                              143
+example1                                     897
+example2                                     214
