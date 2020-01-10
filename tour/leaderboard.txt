@@ -1,2 +1,2 @@
-alkimakgun/myfirst		1937
-example/example		143
+alkimakgun/first                            1937
+example/example                              143

@@ -31,6 +31,7 @@ example: $(TARGET)
 	$< $(EXAMPLEARGS) $(EXAMPLETOURDIR)
 
 tournament: $(TARGET)
+	@clear;
 	$< $(TOURARGS) $(TOURDIR)
 
 $(TARGET): $(OBJECTS) $(DEPSRCS)

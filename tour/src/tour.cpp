@@ -11,7 +11,8 @@
 
 void printHelp(void);
 void printSummary(const Tournament &);
-void writeLeaderboard(const Tournament &);
+void printLeaderboard(const Tournament &, bool save=false);
+void writePlayer(std::ostream &, Player &);
 
 void printHelp()
 {
@@ -74,7 +75,9 @@ int main(int argc, char* argv[])
       tour.play();
 
       printSummary(tour);
-      writeLeaderboard(tour);
+      std::cout.width(48);
+      std::cout << "\n" << std::string(20, ' ') << "LEADERBOARD\n";
+      printLeaderboard(tour, true);
   }
   catch(const std::exception& e)
   {
@@ -87,12 +90,13 @@ int main(int argc, char* argv[])
 
 void printSummary(const Tournament & tour)
 {
-    std::cout << "Bugs participated:\n";
+    std::cout << tour.players.size() << " bugs participated:\n";
     for (auto p_ptr : tour.players)
     {
         std::cout << '\t' << p_ptr->get_name() << '\n';
     }
-    std::cout << "\nMaps played on:\n";
+    std::cout << "\n" << tour.get_registry().maps.size()
+                << " maps played:\n";
     for (auto m : tour.get_registry().maps)
     {
         std::cout << '\t' << dirfile_get_basename(m, 
@@ -100,17 +104,30 @@ void printSummary(const Tournament & tour)
     }
 }
 
-void writeLeaderboard(const Tournament & tour)
+void printLeaderboard(const Tournament & tour, bool save)
 {
-    
-    std::ofstream ofs(LEADERBOARD_FILE);
+    std::ofstream lbofs;
+    if (save)
+        lbofs.open(LEADERBOARD_FILE);
+
     std::vector<std::shared_ptr<Player>> leaderboard(tour.players.begin(),
                                                     tour.players.end()); 
     std::sort(leaderboard.begin(), leaderboard.end(),
               [](auto p1, auto p2) {return p1->get_score() >= p2->get_score();} );
     for (auto p_ptr : leaderboard)
     {
-        ofs << p_ptr->get_name() << "\t\t" << p_ptr->get_score() << '\n';
+        writePlayer(std::cout, *p_ptr);
+        if (save)
+            writePlayer(lbofs, *p_ptr);
     }
-    ofs.close();
+    if (save)
+        lbofs.close();
+}
+
+void writePlayer(std::ostream & ofs, Player & p)
+{
+    ofs.width(32);
+    ofs << std::left << p.get_name();
+    ofs.width(16);
+    ofs << std::right << p.get_score() << '\n';
 }
