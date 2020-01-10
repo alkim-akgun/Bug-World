@@ -1,8 +1,10 @@
 #include "Tournament.hpp"
 
+#include <algorithm>
+
 #include "config.hpp"
 
-#include <boost/algorithm/string/predicate.hpp>
+static std::string extension_lowercase(const fs::path &);
 
 void Tournament::play()
 {
@@ -40,6 +42,14 @@ void Tournament::play()
   this->joinThreads();
 }
 
+std::string extension_lowercase(const fs::path & p)
+{
+  std::string extension(p.extension().generic_string());
+  std::transform(extension.begin(), extension.end(), 
+                  extension.begin(), ::tolower);
+  return extension;
+}
+
 void Tournament::registerFiles()
 {
   fs::path mappath(this->registry.directory / MAP_DIRECTORY);
@@ -60,9 +70,9 @@ void Tournament::registerFiles()
 
   for (it = fs::recursive_directory_iterator(mappath);
         it != end; ++it)
-  {
+  {    
     if (fs::is_regular_file(it->status())
-        && boost::iequals(it->path().extension().generic_string(), MAP_EXTENSION))
+        && extension_lowercase(*it)== MAP_EXTENSION)
     {
       this->registry.maps.push_back(it->path());
     }
@@ -72,7 +82,7 @@ void Tournament::registerFiles()
         it != end; ++it)
   {
     if (fs::is_regular_file(it->status())
-        && boost::iequals(it->path().extension().generic_string(), BUG_EXTENSION))
+        && extension_lowercase(*it)== BUG_EXTENSION)
     {
       this->registry.bugs.push_back(it->path());
     }
