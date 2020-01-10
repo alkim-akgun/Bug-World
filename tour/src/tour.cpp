@@ -1,16 +1,19 @@
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <getopt.h>
 #include <vector>
 #include <algorithm>
 
 #include "Tournament.hpp"
+#include "config.hpp"
+#include "utility.hpp"
 
-#define DEFAULT_CYCLES 1000000
+void printHelp(void);
+void printSummary(const Tournament &);
+void writeLeaderboard(const Tournament &);
 
-void printLeaderboard(const Tournament &);
-
-void printHelp(void)
+void printHelp()
 {
     std::cout << "Usage: tour [OPTIONS] DIR\n"
                  "Tournament simulator for Bug World.\n\n"
@@ -65,11 +68,13 @@ int main(int argc, char* argv[])
       if (argc - optind != 1)
           throw std::runtime_error("expected an argument for the directory");
 
-      std::string dir(argv[optind]);
+      std::string directory(argv[optind]);
 
-      Tournament tour(dir, cycles);
+      Tournament tour(directory, cycles);
       tour.play();
-      printLeaderboard(tour);
+
+      printSummary(tour);
+      writeLeaderboard(tour);
   }
   catch(const std::exception& e)
   {
@@ -80,15 +85,32 @@ int main(int argc, char* argv[])
   return EXIT_SUCCESS;
 }
 
-void printLeaderboard(const Tournament & tour)
+void printSummary(const Tournament & tour)
 {
-  std::vector<std::shared_ptr<Player>> lb(tour.players.begin(),
-                                          tour.players.end()); 
-  std::sort(lb.begin(), lb.end(),
+    std::cout << "Bugs participated:\n";
+    for (auto p_ptr : tour.players)
+    {
+        std::cout << '\t' << p_ptr->get_name() << '\n';
+    }
+    std::cout << "\nMaps played on:\n";
+    for (auto m : tour.get_registry().maps)
+    {
+        std::cout << '\t' << dirfile_get_basename(m, 
+                        tour.get_registry().directory / MAP_DIRECTORY) + '\n';
+    }
+}
+
+void writeLeaderboard(const Tournament & tour)
+{
+    
+    std::ofstream ofs(LEADERBOARD_FILE);
+    std::vector<std::shared_ptr<Player>> leaderboard(tour.players.begin(),
+                                                    tour.players.end()); 
+    std::sort(leaderboard.begin(), leaderboard.end(),
               [](auto p1, auto p2) {return p1->get_score() >= p2->get_score();} );
-  std::cout << "\tLEADER BOARD\n\n";
-  for (auto p : lb)
-  {
-    std::cout << p->get_name() << "\t\t" << p->get_score() << '\n';
-  }
+    for (auto p_ptr : leaderboard)
+    {
+        ofs << p_ptr->get_name() << "\t\t" << p_ptr->get_score() << '\n';
+    }
+    ofs.close();
 }

@@ -5,12 +5,9 @@
 #include <vector>
 #include <memory>
 
-#include <experimental/filesystem>
-
 #include "Player.hpp"
 #include "Match.hpp"
-
-namespace fs = std::experimental::filesystem;
+#include "fs.hpp"
 
 struct Registry
 {
@@ -36,6 +33,8 @@ class Tournament
   inline Tournament(std::string dir, int cyc) : cycles(cyc) {
     this->registry.directory = fs::path(dir); }
   void play();
+  inline Registry get_registry() const { return this->registry; }
+  inline Registry & get_registry() { return this->registry; }
   inline std::string get_directory() {
     return this->registry.directory.generic_string(); }
 };
