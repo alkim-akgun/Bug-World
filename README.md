@@ -28,17 +28,21 @@ Two nations (Red and Black) of bugs compete to collect the greater amount of foo
 
 ### Rules
 
-1. Map is hexagonal (even though its representation in `.world` map files and map reports does not look so) and consists of cells.
-2. A cell may be obstructed by an obstacle (a rock). If it is not, a bug can move to that cell occupying it, if it is not already occupied by another bug.
-3. If a bug is surrounded by 5 members of the opposing nation, it gets killed and turns to 3 units of food.
+1. Map is hexagonal (even though its representation in `.world` files and map reports does not look so) and consists of cells.
+2. The game starts with one bug for each home cell in the map, with various obstacles and food spread around the map.
+3. A cell may be obstructed by an obstacle (a rock). If it is not, a bug can move to that cell occupying it, if it is not already occupied by another bug.
 4. Each bug executes 1 instruction per cycle. After a `move` instruction, a bug must rest for 14 cycles.
-5. A bug can mark/unmark a cell with/of one of its 6 different nation-specific markers.
-6. A bug can sense its close neighbourhood.
+5. If a bug is surrounded by 5 members of the opposing nation, it gets killed and turns to 3 units of food.
+6. A bug can mark/unmark a cell with/of one of its 6 different nation-specific markers.
+7. A bug can sense its close neighbourhood.
+8. A bug can carry 1 unit of food.
+9. A cell can contain multiple units of food.
+10. The winner is the side with the greater amount of food on their home cells at the end.
 
 Rules are more easily understood by writing buggy assembly or bug machine description. Read below to find out.
 
 
-## Buggy Assembly Language
+### Buggy Assembly Language
 Buggy code is written to a file with `.buggy` extension. `;` comments what comes after in that line. The language rules are as follows.
 
 `[label]:`; label this location in code (don't forget the colon (`:`) at the end).
@@ -73,7 +77,7 @@ Each of these rules is one line in the code. Following are the argument options.
 
 The flow of instructions is top-down, except the `goto [label]` instruction will take it to `[label]`. See an example [here](asm/data/example/example.buggy); execute `make example` in [asm](asm) to see the machine description it generates.
 
-## Bug Machine Description
+### Bug Machine Description
 
 Bug machine description is written in a file with `.bug` extension. `;` comments what comes after in that line. Most of the instructions have the same semantics as in the buggy assembly language. The description rules are as follows.
 
@@ -110,6 +114,20 @@ Each of these instructions is one line in the code. Following are the argument o
 `[direction]` is an integer from 1 to 6 (inclusive). The numbers indicate east, south-east, south-west, west, north-west and north-east in this order.
 
 A bug, at each state, will execute the instruction corresponding to that state, and each instruction sets the next state for that bug. See an example of machine description [here](sim/data/example/example1.bug) or [here](sim/data/example/example2.bug) or anywhere in [here](tour/data/bugs). For instructions with two `[state]` arguments (`sense`, `pickup`, `move`, `flip`, `direction`), the first one is the success state and the second one is the fail state always.
+
+### World
+
+A world file has an extension `.world`. A world with width `W` and height `H` follows this format:
+
+1. First line is `W`
+2. Second line is `H`
+3. `H` lines representing the map follow, each with `W` characters.
+3.1. Each character is one of the following: `.`, `#`, `+`, `-`, `[1-9]`; `[1-9]` is any digit from 1 to 9 (inclusive).
+     - `.` denotes an unobstructed cell.
+     - `#` denotes an obstructed cell.
+     -`+` denotes a red bug home.
+     - `-` denotes a black bug home.
+     - `[1-9]` denotes the number of units of food in that cell.
 
 ## Acknowledgement
 
