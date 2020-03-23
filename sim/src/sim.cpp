@@ -33,6 +33,7 @@ void printHelp(void)
 
 int main(int argc, char* argv[])
 {
+    bool tour = false; // is a worker process for tournament?
     int cycles = 1000; // default number of cycles
     bool stats = false;
     bool slow = false;
@@ -48,6 +49,7 @@ int main(int argc, char* argv[])
         { "every",  required_argument, nullptr, 'e'},
         { "report", required_argument, nullptr, 'r'},
         { "help",   no_argument,       nullptr, 'h'},
+        { "tour",   no_argument,       nullptr, 't'}, // for tournament
         { 0,        0,                 0,        0 } // terminate
     };
 
@@ -63,6 +65,9 @@ int main(int argc, char* argv[])
 
             switch (c)
             {
+                case 't':
+                    tour = true;
+                    break;
                 case 'n': // --cycles
                     cycles = std::stoi(optarg);
                     break;
@@ -103,9 +108,18 @@ int main(int argc, char* argv[])
         std::string worldfile = argv[optind];
         std::string redbugfile = argv[optind+1];
         std::string blackbugfile = argv[optind+2];
+
+        if (tour) // worker process for tournament
+        {
+            Game this_game(worldfile, redbugfile, blackbugfile, false); // no log
+            this_game.simulate(cycles, false, false, 0, "", true, true); // tour
+        }
+        else // simulation
+        {
+            Game this_game(worldfile, redbugfile, blackbugfile);
+            this_game.simulate(cycles, stats, slow, every, report, false);
+        }
  
-        Game this_game(worldfile, redbugfile, blackbugfile);
-        this_game.simulate(cycles, stats, slow, every, report, false); // not silent
     }
     catch(const std::exception& e)
     {
