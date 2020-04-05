@@ -2,14 +2,20 @@
 #include <string>
 #include <getopt.h>
 #include <time.h>
+#include <unistd.h>
+#include <errno.h>
 
 #include "Game.hpp"
+
+#define TOUR_BUF_SIZE 64 // must be the same with READ_BUF_SIZE in tour->Match.cpp
 
 void printHelp(void)
 {
     std::cout << "Usage: sim [OPTIONS] WORLDFILE REDBUGFILE BLACKBUGFILE\n"
                  "Simulator for Bug World.\n\n"
                  "Options:\n"
+                 "  -h, --help                   \t"
+                 "Print this message\n\n"
                  "  -n N, --cycles N             \t"
                  "Set the number of cycles to execute N\n"
                  "  -w, --slow                   \t"
@@ -20,9 +26,9 @@ void printHelp(void)
                  "  -e E, --every E              \t"
                  "Print the state of the simulation every E cycles\n"
                  "  -r REPOPT, --report REPOPT\t"
+                 "  -p, --worker FD              \t"
+                 "Run as a worker process with and write the score to file descriptor FD"
                  "Set the format for reporting the state of the simulation\n"
-                 "  -h, --help                   \t"
-                 "Print this message\n\n"
                  "Report options:\n"
                  "  map                          \t"
                  "Map view similar to the world file format\n"
@@ -33,8 +39,8 @@ void printHelp(void)
 
 int main(int argc, char* argv[])
 {
-    bool tour = false; // is a worker process for tournament?
-    int cycles = 1000; // default number of cycles
+    int worker = -1;     // file descriptor to write to as a worker
+    int cycles = 1000;   // default number of cycles
     bool stats = false;
     bool slow = false;
     int every = 0;
@@ -49,7 +55,7 @@ int main(int argc, char* argv[])
         { "every",  required_argument, nullptr, 'e'},
         { "report", required_argument, nullptr, 'r'},
         { "help",   no_argument,       nullptr, 'h'},
-        { "tour",   no_argument,       nullptr, 't'}, // for tournament
+        { "worker", required_argument, nullptr, 'p'}, // for tournament
         { 0,        0,                 0,        0 } // terminate
     };
 
@@ -65,8 +71,8 @@ int main(int argc, char* argv[])
 
             switch (c)
             {
-                case 't':
-                    tour = true;
+                case 'p':
+                    worker = std::stoi(optarg);
                     break;
                 case 'n': // --cycles
                     cycles = std::stoi(optarg);
@@ -109,10 +115,37 @@ int main(int argc, char* argv[])
         std::string redbugfile = argv[optind+1];
         std::string blackbugfile = argv[optind+2];
 
-        if (tour) // worker process for tournament
+        if (worker >= 0) // worker process (e.g for tournament)
         {
+            std::cerr << "Parent (ID: " + std::to_string(getppid()) + ") started this sim (ID: " + std::to_string(getpid()) + ").\n";
             Game this_game(worldfile, redbugfile, blackbugfile, false); // no log
-            this_game.simulate(cycles, false, false, 0, "", true, true); // tour
+            this_game.simulate(cycles, false, false, 0, "", true);
+
+            std::pair<int, int> s = this_game.get_score();
+            std::string w = std::to_string(s.first) + " "
+                          + std::to_string(s.second);
+            if ((w.length()+1)*sizeof(char) > TOUR_BUF_SIZE)
+            {
+                throw std::runtime_error("size of data to write is bigger than TOUR_BUF_SIZE");
+            }
+            std::cerr << "sim is writing " + w + " to FD " + std::to_string(worker) + "\n";
+            ssize_t p = write(worker, w.c_str(), (w.length()+1)*sizeof(char));
+            if (p == -1)
+            {
+                perror("write failed");
+                throw std::runtime_error("write failed");
+            }
+            else if ((size_t)p < (w.length()+1)*sizeof(char))
+            {
+                throw std::runtime_error("write wrote less than expected");
+            }
+
+            int c = close(worker);
+            if (c == -1)
+            {
+                perror("close failed");
+                throw std::runtime_error("close failed");
+            }
         }
         else // simulation
         {
@@ -123,7 +156,7 @@ int main(int argc, char* argv[])
     }
     catch(const std::exception& e)
     {
-        std::cerr << argv[0] << ": " << e.what() << '\n';
+        std::cerr << argv[0] << ": " << e.what() << std::endl;
         return EXIT_FAILURE;
     }
     

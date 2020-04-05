@@ -19,20 +19,30 @@ TARGET          := $(BINDIR)/tour
 INCLUDE         := -I$(SRCDIR) $(DEPINCLDIRS:%=-I%)
 LIBRARY         := -lstdc++fs
 
+SIM             := ../sim
+SIMBIN          := bin/sim
+
 TOURDIR         := ./data
-TOURARGS        := --cycles 100000
+TOURARGS        := --cycles 1000000
 
 EXAMPLETOURDIR  := ./data/example
 EXAMPLEARGS     := --cycles 50000
 
-all: $(TARGET)
+all: build sim
 
-example: $(TARGET)
-	$< $(EXAMPLEARGS) $(EXAMPLETOURDIR)
+build: $(TARGET)
 
-tournament: $(TARGET)
+example: all
+	$(TARGET) $(EXAMPLEARGS) $(EXAMPLETOURDIR)
+
+tournament: all
 	@clear;
-	$< $(TOURARGS) $(TOURDIR)
+	$(TARGET) $(TOURARGS) $(TOURDIR)
+
+sim: $(SIM)/Makefile
+	$(MAKE) -s -C $(SIM)
+	cp $(SIM)/$(SIMBIN) $(BINDIR)
+
 
 $(TARGET): $(OBJECTS) $(DEPSRCS)
 	@mkdir -p $(BINDIR)
@@ -55,4 +65,4 @@ cleanall: clean
 		$(MAKE) -s -C $$dep clean; \
 	done
 
-.PHONY: all example tournament clean cleanall
+.PHONY: all build bundle example tournament sim clean cleanall

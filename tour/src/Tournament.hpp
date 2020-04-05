@@ -30,9 +30,8 @@ class Tournament
   std::vector<std::shared_ptr<Player>> players;
   std::vector<std::shared_ptr<Match>> matchPool;
 
-  inline Tournament(std::string dir, int cyc) : cycles(cyc) {
-    this->registry.directory = fs::path(dir); }
-  void play();
+  inline Tournament(std::string dir){ this->registry.directory = fs::path(dir); }
+  void play(int);
   inline Registry get_registry() const { return this->registry; }
   inline Registry & get_registry() { return this->registry; }
   inline std::string get_directory() {

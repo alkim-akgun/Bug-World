@@ -22,7 +22,7 @@ Game::Game(std::string worldfile, std::string redbugfile,
 Game::~Game() = default;
 
 void Game::simulate(int cycles, bool stats, bool slow, int every,
-              std::string report, bool silent, bool tour)
+              std::string report, bool silent)
 {
     if (cycles < 0)
     {
@@ -58,10 +58,6 @@ void Game::simulate(int cycles, bool stats, bool slow, int every,
     {
         std::cout << "\n";
         print_stats(this_world);
-    }
-    if (tour)
-    {
-        std::cout << this_world.red_food() << " " << this_world.black_food();
     }
 }
 

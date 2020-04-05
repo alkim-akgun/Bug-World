@@ -1,10 +1,10 @@
 Map: example/example
                                 Game 1 (R\B)            Game 2 (B\R)            
-example/example                 154                     175                     
-alkimakgun/first                605                     503                     
+example/example                 170                     153                     
+alkimakgun/first                587                     518                     
 
 Map: alkimakgun/rndmap
                                 Game 1 (R\B)            Game 2 (B\R)            
-example/example                 196                     109                     
-alkimakgun/first                506                     667                     
+example/example                 247                     144                     
+alkimakgun/first                437                     559                     
 

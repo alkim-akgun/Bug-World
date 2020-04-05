@@ -6,7 +6,7 @@
 
 static std::string extension_lowercase(const fs::path &);
 
-void Tournament::play()
+void Tournament::play(int cycles)
 {
   this->registerFiles();
 
@@ -33,7 +33,7 @@ void Tournament::play()
       {
         this->matchPool.push_back(std::make_shared<Match>
           (mapFile.generic_string(), this->players[i],
-           this->players[j], this->cycles));
+           this->players[j], cycles));
         this->matchPool.back()->play();
       }
     }

@@ -4,10 +4,10 @@
 #include <array>
 #include <memory>
 #include <thread>
+#include <mutex>
 
 #include "score.hpp"
 #include "Player.hpp"
-#include "Game.hpp"
 
 typedef std::pair<score, score> matchResult;
 
@@ -17,11 +17,12 @@ class Match
   private:
   std::string map;
   std::array<std::shared_ptr<Player>, 2> players;
-  std::array<std::unique_ptr<Game>, 2> games; // store games in the heap
   int cycles;
   std::array<std::thread, 2> threads;
   std::array<score, 2> results;
   void playGame(size_t); // thread function
+  std::mutex m;
+  static std::mutex sm;
 
   public:
   Match(const std::string &, const std::shared_ptr<Player>,

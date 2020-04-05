@@ -10,11 +10,15 @@
 #include "utility.hpp"
 #include "fs.hpp"
 
-void printHelp(void);
+
+void printHelp();
 void printSummary(const Tournament &);
 void printLeaderboard(const Tournament &, bool save=false);
 void writePlayer(std::ostream &, Player &);
 void writeMatchResults(const Tournament &, const std::string);
+
+std::string ARGV0;
+
 
 void printHelp()
 {
@@ -28,69 +32,74 @@ void printHelp()
               << std::endl;
 }
 
+
 int main(int argc, char* argv[])
 {
-  int cycles = DEFAULT_CYCLES;
-  const char* const short_options = "n:h";
-  const option long_options[] =
-  {
-      { "cycles",    required_argument, nullptr, 'n'},
-      { "help",      no_argument,       nullptr, 'h'},
-      { 0,           0,                 0,        0 } // terminate
-  };
+    ARGV0 = std::string(argv[0]);
 
-  try
-  {
-      while (true)
-      {
-          const int c = getopt_long(argc, argv, short_options,
-                                    long_options, nullptr);
-          if (c == -1)
-              break;
+    int cycles = DEFAULT_CYCLES;
+    const char* const short_options = "n:h";
+    const option long_options[] =
+    {
+        { "cycles",    required_argument, nullptr, 'n'},
+        { "help",      no_argument,       nullptr, 'h'},
+        { 0,           0,                 0,        0 } // terminate
+    };
 
-          switch (c)
-          {
-              case 'n': // --cycles
-                  cycles = std::stoi(optarg);
-                  break;
-              case 'h': // --help
-                  printHelp();
-                  return EXIT_SUCCESS;
-                  break;
-              case ':': // option missing argument
-              case '?': // invalid option
-                  return EXIT_FAILURE;
-                  break; // getopt prints an error
-              default:
-                  printHelp();
-                  return EXIT_FAILURE;
-                  break;
-          }
-      }
-      
-      if (argc - optind != 1)
-          throw std::runtime_error("expected an argument for the directory");
+    try
+    {
+        while (true)
+        {
+            const int c = getopt_long(argc, argv, short_options,
+                                        long_options, nullptr);
+            if (c == -1)
+                break;
 
-      std::string directory(argv[optind]);
+            switch (c)
+            {
+                case 'n': // --cycles
+                    cycles = std::stoi(optarg);
+                    break;
+                case 'h': // --help
+                    printHelp();
+                    return EXIT_SUCCESS;
+                    break;
+                case ':': // option missing argument
+                case '?': // invalid option
+                    return EXIT_FAILURE;
+                    break; // getopt prints an error
+                default:
+                    printHelp();
+                    return EXIT_FAILURE;
+                    break;
+            }
+        }
+        
+        if (argc - optind != 1)
+            throw std::runtime_error("expected an argument for the directory");
 
-      Tournament tour(directory, cycles);
-      tour.play();
+        std::string directory(argv[optind]);
 
-      printSummary(tour);
-      std::cout << '\n';
-      std::cout.width(32);
-      std::cout  << "LEADERBOARD\n";
-      printLeaderboard(tour, true);
-      writeMatchResults(tour, directory);
-  }
-  catch(const std::exception& e)
-  {
-      std::cerr << argv[0] << ": " << e.what() << '\n';
-      return EXIT_FAILURE;
-  }
-  
-  return EXIT_SUCCESS;
+
+        Tournament tour(directory);
+        tour.play(cycles);
+
+        printSummary(tour);
+        std::cout << '\n';
+        std::cout.width(32);
+        std::cout  << "LEADERBOARD\n";
+        printLeaderboard(tour, true);
+        writeMatchResults(tour, directory);
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << argv[0] << ": " << e.what() << '\n';
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
 }
+
 
 void printSummary(const Tournament & tour)
 {
@@ -107,6 +116,7 @@ void printSummary(const Tournament & tour)
                         tour.get_registry().directory / MAP_DIRECTORY) + '\n';
     }
 }
+
 
 void printLeaderboard(const Tournament & tour, bool save)
 {
@@ -129,6 +139,7 @@ void printLeaderboard(const Tournament & tour, bool save)
         lbofs.close();
 }
 
+
 void writePlayer(std::ostream & ofs, Player & p)
 {
     ofs.width(32);
@@ -136,6 +147,7 @@ void writePlayer(std::ostream & ofs, Player & p)
     ofs.width(16);
     ofs << std::right << p.get_score() << '\n';
 }
+
 
 void writeMatchResults(const Tournament & tour, const std::string dir)
 {
